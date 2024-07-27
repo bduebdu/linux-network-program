@@ -11,7 +11,7 @@ using namespace std;
     {
         printf("parent process-num:%d\n",num);
         printf("parent process - child pid = %d, pid = %d\n", pid,getpid());
-        
+
     }
     else if(pid == 0)
     {
@@ -23,7 +23,7 @@ using namespace std;
         perror("fork error:");
         exit(-1);
     }
-    printf("hello world\n");
+       printf("hello world\n");
     while (1)
     {
         sleep(1);
