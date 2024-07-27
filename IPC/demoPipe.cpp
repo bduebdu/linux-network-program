@@ -7,6 +7,7 @@ using namespace std;
 #include <sys/wait.h>
 #include <cstring>
 #include<string>
+
 #define BUFFER_SIZE 32
 int main()
 {
