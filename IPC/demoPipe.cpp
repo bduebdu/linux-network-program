@@ -24,9 +24,9 @@ int main()
         string res = "hello world";
         write(pipefd[1],res.c_str(),res.size());
 
-        char readBuffer[BUFFER_SIZE] = {0};
-        read(pipefd[0],readBuffer ,sizeof(readBuffer));
-        printf("parent readBuffer = %s\n",readBuffer);
+        // char readBuffer[BUFFER_SIZE] = {0};
+        // read(pipefd[0],readBuffer ,sizeof(readBuffer));
+        // printf("parent readBuffer = %s\n",readBuffer);
 
         wait(NULL);//回收
     }
@@ -35,6 +35,12 @@ int main()
         close(pipefd[1]);
         sleep(3);
         cout<< "I am child"<<endl;
+        int flags=fcntl(pipefd[0],F_GETFL);//得到文件描述符的状态标记
+        cout<< "flags:"<<flags<<endl;
+
+        //设置文件描述符为非阻塞
+        fcntl(pipefd[0],F_SETFL,flags | O_NONBLOCK);
+        //子进程负责读（read是阻塞函数；没有函数是阻塞的，只有文件描述符是阻塞的）
         char buffer[BUFFER_SIZE] = {0};
         read(pipefd[0],buffer,sizeof(buffer));
         
