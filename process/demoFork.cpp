@@ -57,16 +57,6 @@ int main()
         printf("child process - num : %d\n",buffer);
         //子进程代码
         printf("child process pid = %d,ppid = %d\n",getpid(), getppid() );
-
-        int buffer = 0;
-        int ret = readFile();
-        if(ret == -1)
-        {
-            //进程退出
-            int exitStatus = 11;
-            _exit(exitStatus);
-        }
-        printf("buffer = %d\n",buffer);
     }
 
     else if(pid< 0)
@@ -74,10 +64,6 @@ int main()
         perror("fork error:");
         exit(-1);
     }
-    //回收子进程
-    int childStatus = 0;
-    wait(&childStatus);
-    printf("childStatus = %d\n",childStatus);
     printf("hello world!"); 
     
 
