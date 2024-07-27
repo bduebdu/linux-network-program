@@ -3,6 +3,22 @@ using namespace std;
 
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+static int writeFile(const char * filename, const void *buf,size_t size)
+{
+    int fd = open(filename, O_RDWR | O_CREAT,0644);
+    if(fd==1)
+    {
+        perror("open error");
+        return -1;
+    }
+    int writeBytes = write(fd,buf ,size);
+    close(fd);
+    return writeBytes;
+}
  int main ()
  {
     int num = 100;
@@ -12,13 +28,19 @@ using namespace std;
         num+=666;
         printf("parent process-num:%d\n",num);
         printf("parent process - child pid = %d, pid = %d\n", pid,getpid());
-
+        
+        writeFile("./record.txt", &num,sizeof(num));
     }
     else if(pid == 0)
     {
         sleep(3);
         printf("child process-num: %d\n",num);
         printf("child process - pid = %d\n, ppid = %d\n", getpid(),getppid());
+
+        int buffer = 0;
+        readFile("./record.txt",&buffer,sizeof(buffer));
+        
+        printf("buffer = %d\n",buffer);
     }
     else if (pid < 0)
     {
