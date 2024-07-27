@@ -9,17 +9,20 @@ using namespace std;
     pid_t pid = fork();
     if(pid > 0)
     {
+        num+=666;
         printf("parent process-num:%d\n",num);
         printf("parent process - child pid = %d, pid = %d\n", pid,getpid());
 
     }
     else if(pid == 0)
     {
-        printf("child process\n");
-        printf("child process - pid = %d\n", pid);
+        sleep(3);
+        printf("child process-num: %d\n",num);
+        printf("child process - pid = %d\n, ppid = %d\n", getpid(),getppid());
     }
     else if (pid < 0)
     {
+
         perror("fork error:");
         exit(-1);
     }
