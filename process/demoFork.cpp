@@ -19,6 +19,18 @@ static int writeFile(const char * filename, const void *buf,size_t size)
     close(fd);
     return writeBytes;
 }
+static int readFile(const char * filename, const void *buf,size_t size)
+{
+    int fd = open(filename, O_RDWR );
+    if(fd==-1)
+    {
+        perror("open error");
+        return -1;
+    }
+    int readBytes = write(fd,buf ,size);
+    close(fd);
+    return readBytes;
+}
  int main ()
  {
     int num = 100;
