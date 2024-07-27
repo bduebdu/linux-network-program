@@ -9,6 +9,7 @@ using namespace std;
 #include<string>
 
 #define BUFFER_SIZE 32
+
 int main()
 {
     //创建管道
