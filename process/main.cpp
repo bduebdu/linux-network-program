@@ -5,6 +5,10 @@ using namespace std;
 
 int main ()
 {
+    pid_t pid = getpid();
+    cout << "pid:" << pid << endl;
+    pid_t ppid = getppid();
+    cout << "ppid:" << ppid << endl;
     while(1)
     {
         sleep(1);
