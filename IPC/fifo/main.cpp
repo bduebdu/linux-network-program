@@ -7,7 +7,7 @@ int main()
 {
     //创建进程
     pid_t pid= fork();
-
+    
 
 
     return 0;
