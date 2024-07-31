@@ -1,7 +1,7 @@
 #include "binarySearchTree.h"
 #include <stdio.h>
 #include<stdlib.h>
-
+#include <string.h>
 enum STATUS_CODE
 {
     ON_SUCCESS,
@@ -110,4 +110,8 @@ int binarySearchTreeInsert(BinarySearchTree *pTree,ELEMENT_TYPE data)
     //元素个数加1
     pTree->size++;
     return ON_SUCCESS;
+}
+int main()
+{
+    return 0;
 }
