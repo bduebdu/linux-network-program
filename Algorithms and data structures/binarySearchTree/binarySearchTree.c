@@ -10,8 +10,14 @@ enum STATUS_CODE
     ACCESS_INVAILD,
 };
 
+// 前置声明
+static int binarySearchTreePreOrder(BinarySearchTree *ptree,BinarySearchNode *travelNode);
+static BinarySearchNode *createBinarySearchTreeNode(ELEMENT_TYPE data,BinarySearchNode * parent);
+static int binarySearchTreeInOrder(BinarySearchTree *ptree,BinarySearchNode *travelNode);
+static int binarySearchTreePostOrder(BinarySearchTree *ptree,BinarySearchNode *travelNode);
+
 //初始化树
-int binarySearchTreeInit(BinarySearchTree **pTree,int (*compareFunc)(ELEMENT_TYPE arg1,ELEMENT_TYPE arg2))
+int binarySearchTreeInit(BinarySearchTree **pTree,int (*compareFunc)(ELEMENT_TYPE arg1,ELEMENT_TYPE arg2),int(*printFunc)(ELEMENT_TYPE arg))
 {
     BinarySearchTree * tree = (BinarySearchTree *)malloc(sizeof(BinarySearchTree)*1);
     if(tree == NULL)
@@ -25,8 +31,8 @@ int binarySearchTreeInit(BinarySearchTree **pTree,int (*compareFunc)(ELEMENT_TYP
     tree->root = NULL;
     //比较器
     tree->compareFunc = compareFunc;
-
-
+    //打印器
+    tree->printFunc = printFunc;
 
     //二级指针解引用
     *pTree =tree;
@@ -111,6 +117,82 @@ int binarySearchTreeInsert(BinarySearchTree *pTree,ELEMENT_TYPE data)
     pTree->size++;
     return ON_SUCCESS;
 }
+
+static int binarySearchTreePreOrder(BinarySearchTree *ptree,BinarySearchNode *travelNode)
+{
+    if(travelNode == NULL)
+    {
+        return ON_SUCCESS;
+    }
+    ptree->printFunc(travelNode->data);
+    
+    binarySearchTreePreOrder(ptree,travelNode->left);
+
+    binarySearchTreePreOrder(ptree,travelNode->right);
+
+}
+
+//根，左，右
+int binarySearchTreePreForech(BinarySearchTree *ptree)
+{
+    if(ptree == NULL)
+    {
+        return NULL_PTR;
+    }
+    return binarySearchTreePreOrder(ptree,ptree->root);
+
+
+}
+
+static int binarySearchTreeInOrder(BinarySearchTree *ptree,BinarySearchNode *travelNode)
+{
+    if(travelNode==NULL)
+    {
+        return ON_SUCCESS;
+    }
+    binarySearchTreeInOrder(ptree,travelNode->left);
+    ptree->printFunc(travelNode->data);
+    binarySearchTreeInOrder(ptree,travelNode->right);
+}
+int binarySearchTreeInOrderForech(BinarySearchTree *ptree)
+{
+    if(ptree == NULL)
+    {
+        return NULL_PTR;
+    }
+    return binarySearchTreeInOrder(ptree,ptree->root);
+}
+
+static int binarySearchTreePostOrder(BinarySearchTree *ptree,BinarySearchNode *travelNode)
+{
+    if (travelNode==NULL)
+    {
+        return ON_SUCCESS;
+    }
+    binarySearchTreePostOrder(ptree,travelNode->left);
+    binarySearchTreePostOrder(ptree,travelNode->right);
+    ptree->printFunc(travelNode->data);
+}
+
+int binarySearchTreePostOrderForech(BinarySearchTree *ptree)
+{
+    if(ptree == NULL)
+    {
+        return NULL_PTR;
+    }
+    binarySearchTreePostOrder(ptree,ptree->root);
+}
+
+
+//层序遍历
+int binarySearchTreeLevelOrderForech(BinarySearchTree *ptree)
+{
+
+}
+
+
+
+
 int main()
 {
     return 0;
