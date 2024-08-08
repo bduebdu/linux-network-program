@@ -1,13 +1,13 @@
 #include "stdTcpServer.h"
 #include <iostream>
 using namespace std;
-#include <sys/types.h>          
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <cctype>
+#include <arpa/inet.h>
 
 /* 构造函数 */
 StdTcpSocket::StdTcpSocket() : m_sockAttr(new StdTcpSocketPrivate)
@@ -134,10 +134,6 @@ StdTcpServer::~StdTcpServer()
         m_tcpAttr = nullptr;
     }
 }
-
-
-
-
 /* 设置监听 */
 bool StdTcpServer::setListen(int port)
 {

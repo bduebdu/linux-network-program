@@ -1,16 +1,33 @@
 #include "stdTcpServer.h"
 #include <iostream>
 using namespace std;
-#include <sys/types.h>          
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <cstring>
 #include <netinet/in.h>
-#include <arpa/inet.h>
 #include <cctype>
+#include <arpa/inet.h>
+
+/* 前置声明 */
+struct StdTcpSocketPrivate
+{
+    /* 通信句柄 */
+    int connfd;
+    /* 通信是否建立成功 */
+    bool m_connected;
+};
+
+struct StdTcpServerPrivate
+{
+    /* 监听句柄 */
+    int sockfd;
+    /* 服务器是否正在监听 */
+    bool m_isRunning;
+};
 
 /* 构造函数 */
-StdTcpSocket::StdTcpSocket() : m_sockAttr(new StdTcpSocketPrivate)
+StdTcpSocket::StdTcpSocket() : m_sockAttr(std::make_unique<StdTcpSocketPrivate>())
 {
     /* 通信句柄 */
     m_sockAttr->connfd = -1;
@@ -21,16 +38,10 @@ StdTcpSocket::StdTcpSocket() : m_sockAttr(new StdTcpSocketPrivate)
 /* 析构函数 */
 StdTcpSocket::~StdTcpSocket()
 {
-    close(m_sockAttr->connfd);
-    /* 通信句柄 */
-    m_sockAttr->connfd = -1;
-    /* 通信是否建立 */
-    m_sockAttr->m_connected = false;
-
-    if (m_sockAttr)
+    /* 关闭文件描述符 */
+    if (m_sockAttr->connfd > 0)
     {
-        delete m_sockAttr;
-        m_sockAttr = nullptr;
+        close(m_sockAttr->connfd);
     }
 }
 
@@ -42,7 +53,8 @@ int StdTcpSocket::connectToServer(const char * ip, int port)
     if (sockfd == -1)
     {
         perror("socket error:");
-        return -1;
+        /* 抛异常. */
+        throw std::runtime_error("socket create error.");
     }
     m_sockAttr->connfd = sockfd;
 
@@ -57,7 +69,8 @@ int StdTcpSocket::connectToServer(const char * ip, int port)
     if (ret != 0)
     {
         perror("connect error:");
-        return -1;
+        /* 抛异常. */
+        throw std::runtime_error("connect error.");
     }
 
     m_sockAttr->m_connected = true;
@@ -65,16 +78,14 @@ int StdTcpSocket::connectToServer(const char * ip, int port)
     return 0;
 }
 
-
 /* 获取/得到 属性 */
 StdTcpSocketPrivate * StdTcpSocket::getSockAttr()
 {
-    return m_sockAttr;
+    return m_sockAttr.get();
 }
 
-
 /* 是否连接成功 */
-bool StdTcpSocket::isConnected()
+bool StdTcpSocket::isConnected() const
 {
     return m_sockAttr->m_connected;
 }
@@ -108,7 +119,7 @@ int StdTcpSocket::recvMessage(std::string & recvMessage)
 
 
 /* 构造函数 */
-StdTcpServer::StdTcpServer() : m_tcpAttr(new StdTcpServerPrivate)
+StdTcpServer::StdTcpServer() : m_tcpAttr(std::make_unique<StdTcpServerPrivate>())
 {
     /* 监听套接字 */
     m_tcpAttr->sockfd = -1;
@@ -120,23 +131,11 @@ StdTcpServer::StdTcpServer() : m_tcpAttr(new StdTcpServerPrivate)
 StdTcpServer::~StdTcpServer()
 {
     /* 关闭套接字句柄 */
-    close(m_tcpAttr->sockfd);
-
+    if (m_tcpAttr->sockfd > 0)
     {
-        m_tcpAttr->sockfd = -1;
-        m_tcpAttr->m_isRunning = false;
-    }
-
-    /* 释放内存 */
-    if (m_tcpAttr)
-    {
-        delete m_tcpAttr;
-        m_tcpAttr = nullptr;
+        close(m_tcpAttr->sockfd);
     }
 }
-
-
-
 
 /* 设置监听 */
 bool StdTcpServer::setListen(int port)
@@ -149,7 +148,7 @@ bool StdTcpServer::setListen(int port)
     if (sockfd == -1)
     {
         perror("socket error");
-        return false;
+        throw std::runtime_error("socket create error.");
     }
 
     /* 设置监听的套接字 */
@@ -161,7 +160,7 @@ bool StdTcpServer::setListen(int port)
     if (ret != 0)
     {
         perror("bind error:");
-        return false;
+        throw std::runtime_error("setsockopt error.");
     }
 
     /* 绑定IP和端口 */
@@ -176,7 +175,7 @@ bool StdTcpServer::setListen(int port)
     if (ret != 0)
     {
         perror("bind error:");
-        return false;
+        throw std::runtime_error("bind error");
     }
     
     // 给监听的套接字设置监听
@@ -184,7 +183,7 @@ bool StdTcpServer::setListen(int port)
     if (ret != 0)
     {
         perror("listen error:");
-        return false;
+        throw std::runtime_error("listen error");
     }
 
     /* 设置状态为:正在监听 */
@@ -193,26 +192,24 @@ bool StdTcpServer::setListen(int port)
     return true;
 }
 
-
-
 /* 接收连接 */
-StdTcpSocketPtr StdTcpServer::getClientSock()
+std::shared_ptr<StdTcpSocket> StdTcpServer::getClientSock()
 {
     int clientConnfd = accept(m_tcpAttr->sockfd, NULL, NULL);
     if (clientConnfd == -1)
     {
         perror("accpet error:");
-        return StdTcpSocketPtr();
+        throw std::runtime_error("accept error.");
     }
 
     /* 程序到这个地方, 就说明有客户端进行连接 */
     cout << "clientConnfd:" << clientConnfd << endl;
 
     /* 通信类 */
-    StdTcpSocketPtr ptr(new StdTcpSocket);
+    auto client = std::make_shared<StdTcpSocket>();
     /* 套接字 */
-    ptr->getSockAttr()->connfd = clientConnfd;
-    ptr->getSockAttr()->m_connected = true;
+    client->getSockAttr()->connfd = clientConnfd;
+    client->getSockAttr()->m_connected = true;
 
-    return ptr;
+    return client;
 }

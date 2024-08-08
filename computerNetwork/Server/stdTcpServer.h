@@ -6,13 +6,9 @@ using namespace std;
 #include <string>
 #include <memory>
 
-struct StdTcpSocketPrivate
-{
-    /* 通信句柄 */
-    int connfd;
-    /* 通信是否建立成功 */
-    bool m_connected;
-};
+/* 前置声明 */
+struct StdTcpSocketPrivate;
+struct StdTcpServerPrivate;
 
 /* 通信类 */
 class StdTcpSocket
@@ -28,7 +24,7 @@ public:
     /* 连接服务器 */
     int connectToServer(const char * ip, int port);
     /* 是否连接成功 */
-    bool isConnected();
+    bool isConnected() const;
     /* 发送信息 */
     int sendMessage(std::string & sendMsg);
     /* 发送信息 */
@@ -40,15 +36,8 @@ public:
     /* 设置属性 */
     StdTcpSocketPrivate * getSockAttr();
 private:
-    StdTcpSocketPrivate * m_sockAttr;
-};
-
-struct StdTcpServerPrivate
-{
-    /* 监听句柄 */
-    int sockfd;
-    /* 服务器是否正在监听 */
-    bool m_isRunning;
+    /* 智能指针 */
+    std::unique_ptr<StdTcpSocketPrivate> m_sockAttr;
 };
 
 
@@ -68,12 +57,12 @@ public:
     bool setListen(int port);
 
     /* 接收连接 */
-    StdTcpSocketPtr getClientSock();
+    std::shared_ptr<StdTcpSocket> getClientSock();
 private:
     /* 端口 */
     int m_port;
     /* 服务器的属性 */
-    StdTcpServerPrivate * m_tcpAttr;
+    std::unique_ptr<StdTcpServerPrivate> m_tcpAttr;
 };
 
 

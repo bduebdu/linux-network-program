@@ -1,20 +1,26 @@
-CXX=g++ # 使用 g++ 作为 C++ 编译器
-CXXFLAGS=-Wall -std=c++11 # 编译器标志
+# 自定义变量
+# 变量赋值
+OBJ = $(patsubst %.cpp, %.o, $(wildcard ./*.cpp))
+TARGET = client
 
-# 获取所有的 .cpp 文件，并将它们转换成 .o 文件
-OBJS=$(patsubst %cpp, %o, $(wildcard *.cpp))
+LDFLAGS = -L./src_so -L./dataBase_so -L./hashTable_so
+LIBS = -lpthread
 
-# 定义 client 目标及其依赖的 .o 文件
-client: $(OBJS)
+# 使用$(TARGET)，必须要加$符号
+$(TARGET): $(OBJ)
+	$(CXX) -g $^ -o $@ $(LIBS)
 
-# 编译 client 目标
-client: $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
-
-# 规则来编译单个 .cpp 文件为 .o 文件
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) -g -c $^ -o $@
 
-# 清除目标
+.PHONY: clean
+
 clean:
-	rm -f *.o client
+	@$(RM) $(OBJ) $(TARGET)
+
+show:
+	@echo $(RM)
+	@echo $(CC)
+	@echo $(wildcard ./*.c)
+	@echo $(OBJ)
+	@echo $(CXX)
