@@ -73,6 +73,7 @@
         "optional": "cpp",
         "source_location": "cpp",
         "iomanip": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "set": "cpp"
     }
 }
