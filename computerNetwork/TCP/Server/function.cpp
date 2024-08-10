@@ -1,10 +1,12 @@
 #include "function.h"
 #include<cstring>
+#include "sqliteDataBase.h"
 
 /* 构造函数 */
 Function::Function(const StdTcpSocketPtr & clientInfo)
 {
     m_clientInfo = clientInfo;
+    m_sqliteDB.connectDB("./test.db");
 }
 
 /* 析构函数 */
@@ -104,7 +106,15 @@ void Function::handleAddFriendInfo(const Msg & msg)
 /* 判断用户名是否存在 */
 bool Function::userIsExist(const char * username)
 {
-    /* todo... */
+    string sql = "select count(1) from userinfo where username = '%s';";
+    char requestsql[128] = {0};
+    sprintf(requestsql,sql.c_str(),username);
+    vector<vector<string>> res = m_sqliteDB.query(requestsql);
+    if(res[0][0] == "0")
+    {
+        return false;   
+    }
+    
     return true;
 }
 

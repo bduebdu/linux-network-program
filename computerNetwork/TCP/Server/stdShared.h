@@ -28,6 +28,7 @@ struct Msg
     FUNCTION_OPTION type;
     char name[20];
     char passwd[20];
+    char toName[20];
 };
 
 struct ReplyMsg

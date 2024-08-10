@@ -8,6 +8,7 @@ using namespace std;
 #include "function.h"
 #include "messageHandle.h"
 #include "threadpool.h"
+#include "sqliteDataBase.h"
 
 #define BUFFER_SIZE 1024
 

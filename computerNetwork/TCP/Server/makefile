@@ -4,11 +4,10 @@ OBJ = $(patsubst %.cpp, %.o, $(wildcard ./*.cpp))
 TARGET = server
 
 LDFLAGS = -L./src_so -L./dataBase_so -L./hashTable_so
-LIBS = -ljson-c -lsqlite3 -lSoMyTree -lSoMydataBase -lSoMyHash
-
+LIBS = -lsqlite3
 # 使用$(TARGET)，必须要加$符号
 $(TARGET): $(OBJ)
-	$(CXX) -g $^ -o $@
+	$(CXX) -g $^ -o $@ $(LIBS)
 
 %.o: %.cpp
 	$(CXX) -g -c $^ -o $@

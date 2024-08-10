@@ -5,7 +5,7 @@
 #include <string>
 #include "stdTcpServer.h"
 #include "stdShared.h"
-
+#include "sqliteDataBase.h"
 class Function
 {
 public:
@@ -37,6 +37,8 @@ public:
 
 private:
     StdTcpSocketPtr m_clientInfo;
+
+    stdsqliteDataBase m_sqliteDB;
 };
 
 
