@@ -13,7 +13,7 @@ class stdDataBase
 public:
 
     //虚析构
-    // ~stdDataBase();
+    virtual ~stdDataBase() = default;
 
 public:
     //连接数据库

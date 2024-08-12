@@ -17,7 +17,7 @@ void * handleClientInfo(void * arg)
     /* 线程分离 */
     pthread_detach(pthread_self());
 
-    StdTcpSocketPtr clientInfo = *(StdTcpSocketPtr *)arg;
+    StdTcpSocketPtr clientInfo = *static_cast<StdTcpSocketPtr*>(arg);
 
     int readBytes = 0;
     
@@ -82,7 +82,7 @@ int main()
             _exit(-1);
         }
 #else
-        pool.addTask(handleClientInfo, &clientInfo);
+        pool.addTask(handleClientInfo, new StdTcpSocketPtr(clientInfo));
 #endif
 
         /* 休眠一下 */
