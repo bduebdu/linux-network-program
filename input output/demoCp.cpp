@@ -10,6 +10,7 @@ using namespace std;
 
 #define BUFFER_SIZE 128
 
+
 int myCopyFile(const char*src,const char*dest)
 {
     int fd1 = open(src,O_RDONLY);
