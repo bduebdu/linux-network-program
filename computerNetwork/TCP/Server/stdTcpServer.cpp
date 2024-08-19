@@ -93,7 +93,20 @@ bool StdTcpSocket::isConnected() const
 /* 发送信息 */
 int StdTcpSocket::sendMessage(const void * sendMsg, size_t n)
 {
-    int writeBytes = write(m_sockAttr->connfd, sendMsg, n);
+    //1.先写包数据大小
+    int writeBytes = write (m_sockAttr->connfd,(const void *)&n,sizeof(n));
+    if(writeBytes < 0)
+    {
+        perror("write error");
+        return -1;
+    }
+    //2.再写数据本身
+    writeBytes = write(m_sockAttr->connfd, sendMsg, n);
+    if(writeBytes < 0)
+    {
+        perror("write error");
+        return -1;
+    }
     return writeBytes;
 }
 
@@ -113,8 +126,33 @@ int StdTcpSocket::recvMessage(void * buf, size_t n)
 /* 接收信息 */
 int StdTcpSocket::recvMessage(std::string & recvMessage)
 {
-    /* todo... */
-    return 0;
+    
+    size_t size = 0;
+    if(read(m_sockAttr->connfd,&size,sizeof(size))<=0)
+    {
+        perror("read error");
+        return -1;
+    }
+    cout <<"size:"<<size<<endl;
+    char * msg = new char[size+1];
+    memset(msg,0,sizeof(char) * (size+1));//清除脏数据
+    size_t totalReceived = 0;
+    while(totalReceived < size)
+    {
+        size_t received = read(m_sockAttr->connfd,msg + totalReceived,size - totalReceived);
+        if (received <=0)
+        {
+            perror("read error");
+            delete [] msg;
+            return -1;
+        }
+        totalReceived += received;
+    }
+
+    recvMessage = msg;//接受到的数据
+    delete [] msg;
+
+    return totalReceived;
 }
 
 
