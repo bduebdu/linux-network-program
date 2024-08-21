@@ -11,7 +11,7 @@
 class MessageHandle
 {
 public:
-    using HandleFunction = std::function<void(const Msg &)>;
+    using HandleFunction = std::function<void(const string &)>;
 
     /* 构造函数 */
     MessageHandle(const StdTcpSocketPtr & clientInfo);
@@ -21,7 +21,7 @@ public:
 
 public:
     /* 处理信息 */
-    void handleMessage(const Msg & msg);
+    void handleMessage(const string & msg);
 
 private:
     Function m_funtion;

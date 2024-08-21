@@ -22,10 +22,6 @@ void * handleClientInfo(void * arg)
 
     int readBytes = 0;
     
-    Msg msg;
-    /* 清空脏数据 */
-    memset(&msg, 0, sizeof(msg));
-
     MessageHandle handles(clientInfo);
 
     string buffer;
@@ -34,41 +30,15 @@ void * handleClientInfo(void * arg)
         readBytes = clientInfo->recvMessage(buffer);
         if (readBytes <= 0)
         {
-            cout << "readBytes <= 0" << endl;
+            cout << "readBytes <= 0" <<endl;
             break;
         }
         else
         {
             /* 客户端有数据过来 */
-            // cout << "msg.type:" << msg.type << endl;
-            cout<<"buffer:"<<buffer<<endl;
-            // handles.handleMessage(msg);
-            //buffer是json字符串
-            //1.将json字符串转成json对象
-            json_object * jsonObj = json_tokener_parse(buffer.c_str());
-            if(jsonObj!=NULL)
-            {
-                //2.根据key得到value
-                const char * type = json_object_get_string(json_object_object_get(jsonObj,"type"));
-                const char * username = json_object_get_string(json_object_object_get(jsonObj,"username"));
-                const char * passwd = json_object_get_string(json_object_object_get(jsonObj,"passwd"));
-
-                cout<<"type:"<<type<<endl;
-                cout<<"username:"<<username<<endl;
-                cout<<"passswd:"<<passwd<<endl;                  
-            }
-            else
-            {
-                cout<<"parse error"<<endl;
-            }
-         
- 
-            
+            handles.handleMessage(buffer);//执行注册方法
         }
-       
-        // memset(&msg, 0, sizeof(msg));
         buffer.clear();//清空缓冲区
-        // sleep(10);
     }
  
     /* 资源回收 */

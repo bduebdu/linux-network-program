@@ -111,7 +111,7 @@ int StdTcpSocket::sendMessage(const void * sendMsg, size_t n)
 }
 
 /* 发送信息 */
-int StdTcpSocket::sendMessage(std::string & sendMsg)
+int StdTcpSocket::sendMessage(const std::string & sendMsg)
 {
     return sendMessage(sendMsg.c_str(), sendMsg.size());
 }
@@ -133,9 +133,10 @@ int StdTcpSocket::recvMessage(std::string & recvMessage)
         perror("read error");
         return -1;
     }
-    cout <<"size:"<<size<<endl;
+
     char * msg = new char[size+1];
     memset(msg,0,sizeof(char) * (size+1));//清除脏数据
+    
     size_t totalReceived = 0;
     while(totalReceived < size)
     {

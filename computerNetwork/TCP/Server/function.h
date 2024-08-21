@@ -17,23 +17,25 @@ public:
 private:
     /* 判断用户名是否存在 */
     bool userIsExist(const char * username);
+    //保存用户信息
+    bool saveUserInfo(const char * username, const char *  passwd);
     /* 用户名和密码是否匹配 */
     bool userIsMatchPasswd(const char * username, const char *  passwd);
     /* 用户是否已经登陆/在线 */
     bool userIsOnlined(const char * username);
 public:
     /* 处理注册 */
-    void handleRegisterInfo(const Msg & msg);
+    void handleRegisterInfo(const string & msg);
     /* 处理登陆 */
-    void handleLoginInfo(const Msg & msg);
+    void handleLoginInfo(const string & msg);
 
-    void handleAddFriendInfo(const Msg & msg);
+    void handleAddFriendInfo(const string & msg);
             
-    void handleDelFriendInfo(const Msg & msg);
+    void handleDelFriendInfo(const string & msg);
 
-    void handleNewGroupInfo(const Msg & msg);
+    void handleNewGroupInfo(const string & msg);
 
-    void handleAExitGroupInfo(const Msg & msg);
+    void handleAExitGroupInfo(const string & msg);
 
 private:
     StdTcpSocketPtr m_clientInfo;

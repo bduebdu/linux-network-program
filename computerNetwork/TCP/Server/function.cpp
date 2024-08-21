@@ -1,6 +1,12 @@
 #include "function.h"
-#include<cstring>
+#include <cstring>
+#include <iostream>
+#include <json-c/json.h>
+
+using namespace std;
 #include "sqliteDataBase.h"
+
+
 
 /* 构造函数 */
 Function::Function(const StdTcpSocketPtr & clientInfo)
@@ -15,92 +21,81 @@ Function::~Function()
 
 }
 
-void Function::handleRegisterInfo(const Msg & msg)
+void Function::handleRegisterInfo(const string & msg)
 {
-    /* todo... */
-    std::cout << "username:" << msg.name << std::endl;
-    std::cout << "passwd:" << msg.passwd << std::endl;
-
-    string replyInfo = "注册成功.";
-    m_clientInfo->sendMessage(replyInfo);
-
-#if 1
-    ReplyMsg responseMsg;
-    responseMsg.type == REGISTER;
-    //判断用户是否已经存在
-    if(userIsExist(msg.name) == true)
+    cout<<"handleRegisterInfo:"<<endl;
+    const char * username = NULL;
+    const char * passwd = NULL;
+    json_object * jsonObj = json_tokener_parse(msg.c_str());
+    if(jsonObj!= NULL)
     {
-        responseMsg.ststic_code = REGISTER_USEREXIST;
+        username = json_object_get_string(json_object_object_get(jsonObj,"username"));        
+        passwd = json_object_get_string(json_object_object_get(jsonObj,"passwd"));        
+
+    }
+    //创建json对象
+    json_object * resObj = json_object_new_object();
+    //设置keyvalue
+    json_object_object_add(resObj,"type",json_object_new_int(REGISTER));
+
+    //用户存在
+    if(userIsExist(username) == true)
+    {
+        json_object_object_add(resObj,"result",json_object_new_string("failed"));
+        json_object_object_add(resObj,"reason",json_object_new_string("failed"));
     }
     else
     {
-        responseMsg.ststic_code = REGISTER_SUCCESS;
-        //to do...
+        saveUserInfo(username,passwd);
+        json_object_object_add(resObj,"result",json_object_new_string("success"));
     }
-    //信息发送回客户端
-    this->m_clientInfo ->sendMessage(static_cast<const void *>(&responseMsg),sizeof(responseMsg));
-
-
-#endif
+    //json对象转成json字符串
+    const char * resStr = json_object_to_json_string(resObj);
+    m_clientInfo->sendMessage(resStr);
 }
 
-void Function::handleLoginInfo(const Msg & msg)
+void Function::handleLoginInfo(const string & msg)
 {
-    std::cout << "username:" << msg.name << std::endl;
-    std::cout << "passwd:" << msg.passwd << std::endl;
-
-    string username(msg.name);
-    string passwd(msg.passwd);
-
-    ReplyMsg responseMsg;
-
-    memset(&responseMsg,0,sizeof(responseMsg));
-
-    responseMsg.type == LOGIN;
-    if(username== "zhangsan")
+    cout<<"handleLoginInfo:"<<endl;
+    const char * username = NULL;
+    const char * passwd = NULL;
+    json_object * jsonObj = json_tokener_parse(msg.c_str());
+    if(jsonObj!= NULL)
     {
-        if(passwd =="123456")
+        username = json_object_get_string(json_object_object_get(jsonObj,"username"));        
+        passwd = json_object_get_string(json_object_object_get(jsonObj,"passwd"));        
+
+    }
+   //创建json对象
+    json_object * resObj = json_object_new_object();
+    //设置keyvalue
+    json_object_object_add(resObj,"type",json_object_new_int(LOGIN));
+
+    if(userIsExist(username)==false)//判断用户是否注册
+    {
+        json_object_object_add(resObj,"result",json_object_new_string("failed"));
+        json_object_object_add(resObj,"reason",json_object_new_string("用户不存在"));
+    }
+    else
+    {
+        if(userIsMatchPasswd(username,passwd)==false)
         {
-            //用户名与密码匹配
-            responseMsg.ststic_code = LOGIN_SUCCESS;
+            json_object_object_add(resObj,"result",json_object_new_string("failed"));
+            json_object_object_add(resObj,"reason",json_object_new_string("密码错误"));
         }
         else
         {
-            //用户名与密码不匹配
-            responseMsg.ststic_code = LOGIN_PASSWD_ERROR;
+            json_object_object_add(resObj,"result",json_object_new_string("success"));
         }
     }
-    else
-    {
-        //无该用户
-        responseMsg.ststic_code = LOGIN_NOUSER;
-    }
-    m_clientInfo->sendMessage(static_cast<const void *>(&responseMsg),sizeof(responseMsg));
-
-#if 0
-    /* 判断用户名是否已经注册 */
-    if (userIsExist(username) == false)
-    {
-        /* 程序进入这个里面, 说明用户名不存在 */
-
-
-        /* 将信息发送到客户端 */
-        
-    }
-    else 
-    {
-        /* 如果用户名存在, 判断用户名和密码是否匹配 */
-        userIsMatchPasswd(username, passwd);
-
-        /* 判断用户是否已经登陆 */
-        userIsOnlined(username);
-    }
-#endif
-
+    //将json对象转成json字符串
+    const char * resStr = json_object_to_json_string(resObj);
+    cout<<"resStr:"<<resStr<<endl;
+    m_clientInfo->sendMessage(resStr);
 }
-void Function::handleAddFriendInfo(const Msg & msg)
+void Function::handleAddFriendInfo(const string & msg)
 {
-    cout << "msg.toName" << msg.toName << endl;
+    // cout << "msg.toName" << msg.toName << endl;
 }
 
 /* 判断用户名是否存在 */
@@ -118,10 +113,34 @@ bool Function::userIsExist(const char * username)
     return true;
 }
 
+//保存用户信息
+bool Function::saveUserInfo(const char * username, const char *  passwd)
+{
+    std::string sql = "insert into userInfo (username,passwd) values ('%s','%s');";
+    char requestSql[128] = {0};
+    sprintf(requestSql,sql.c_str(),username,passwd);
+    if(m_sqliteDB.execute(requestSql) == false)
+    {
+        cout<<"save error"<<__FILE__<<":"<<__LINE__<<endl;
+        return false;
+    }
+    return true;
+
+}
+
 /* 用户名和密码是否匹配 */
 bool Function::userIsMatchPasswd(const char * username, const char *  passwd)
 {
-    /* todo... */
+    string sql = "select count(1) from userInfo where username = '%s' and passwd = '%s';";
+    char requestsql[128] = {0};
+    sprintf(requestsql,sql.c_str(),username,passwd);
+    vector<vector<string>> res = m_sqliteDB.query(requestsql);
+    //QueryResult
+    if(res[0][0] == "0")
+    {
+        return false;
+    }
+
     return true;
 }
 

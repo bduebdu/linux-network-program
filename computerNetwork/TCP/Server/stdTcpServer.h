@@ -26,7 +26,7 @@ public:
     /* 是否连接成功 */
     bool isConnected() const;
     /* 发送信息 */
-    int sendMessage(std::string & sendMsg);
+    int sendMessage(const std::string & sendMsg);
     /* 发送信息 */
     int sendMessage(const void * sendMsg, size_t n);
     /* 接收信息 */

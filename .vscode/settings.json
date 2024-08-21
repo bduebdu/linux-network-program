@@ -74,6 +74,8 @@
         "source_location": "cpp",
         "iomanip": "cpp",
         "variant": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "map": "cpp",
+        "unordered_set": "cpp"
     }
 }

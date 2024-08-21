@@ -1,13 +1,13 @@
 #include "messageHandle.h"
 #include "stdShared.h"
-
+#include <json-c/json.h>
 /* 构造函数 */
 MessageHandle::MessageHandle(const StdTcpSocketPtr & clientInfo) : m_funtion(clientInfo)
 {
     /* 注册业务 */
-    m_handles[REGISTER] = [this](const Msg & msg) {m_funtion.handleRegisterInfo(msg); };
-    m_handles[LOGIN] = [this](const Msg & msg) {m_funtion.handleLoginInfo(msg); };
-    m_handles[ADDFRIEND] = [this](const Msg & msg) {m_funtion.handleAddFriendInfo(msg); };
+    m_handles[REGISTER] = [this](const string & msg) {m_funtion.handleRegisterInfo(msg); };
+    m_handles[LOGIN] = [this](const string & msg) {m_funtion.handleLoginInfo(msg); };
+    m_handles[ADDFRIEND] = [this](const string & msg) {m_funtion.handleAddFriendInfo(msg); };
 }
 
 
@@ -19,7 +19,7 @@ MessageHandle::~MessageHandle()
 
 
 /* 处理信息 */
-void MessageHandle::handleMessage(const Msg & msg)
+void MessageHandle::handleMessage(const string & msg)//此处msg是json字符串
 {
 #if 0
     if (msg.type == REGISTER)
@@ -33,7 +33,14 @@ void MessageHandle::handleMessage(const Msg & msg)
     // ...
 #endif
 
-    auto iter = m_handles.find(msg.type);
+    int type = 0;
+    json_object * jsonObj = json_tokener_parse(msg.c_str());
+    if(jsonObj!=NULL)
+    {
+        //2.根据key得到value
+        type = json_object_get_int(json_object_object_get(jsonObj,"type"));
+    }
+    auto iter = m_handles.find(type);
     if (iter != m_handles.end())
     {
         /* 执行回调函数 */
