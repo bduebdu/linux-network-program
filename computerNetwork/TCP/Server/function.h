@@ -28,6 +28,9 @@ public:
     void handleRegisterInfo(const string & msg);
     /* 处理登陆 */
     void handleLoginInfo(const string & msg);
+    /* 处理下载 */
+    void handleDownloadInfo(const string & filename);
+
 
     void handleAddFriendInfo(const string & msg);
             

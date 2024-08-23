@@ -93,6 +93,22 @@ void Function::handleLoginInfo(const string & msg)
     cout<<"resStr:"<<resStr<<endl;
     m_clientInfo->sendMessage(resStr);
 }
+
+void Function::handleDownloadInfo(const string & filename)
+{
+    cout<<"handleDownloadInfo:"<<endl;
+    //创建json对象
+    json_object * resObj = json_object_new_object();
+    //设置keyvalue
+    json_object_object_add(resObj,"type",json_object_new_int(DOWNLOAD));
+    json_object_object_add(resObj,"result",json_object_new_string("success"));
+    //将json对象转成json字符串
+    const char * resStr = json_object_to_json_string(resObj);
+    m_clientInfo->sendMessage(resStr);    
+}
+
+
+
 void Function::handleAddFriendInfo(const string & msg)
 {
     // cout << "msg.toName" << msg.toName << endl;

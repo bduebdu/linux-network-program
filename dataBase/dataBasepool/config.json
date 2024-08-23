@@ -1,0 +1,9 @@
+{
+    "hostname":"localhost",
+    "username":"root",
+    "passwd":"123456",
+    "dbname":"demoTest",
+    "port":"3306",
+    "minsize":3
+
+}

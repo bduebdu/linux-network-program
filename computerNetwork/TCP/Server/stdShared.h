@@ -11,6 +11,7 @@ enum FUNCTION_OPTION
     DELFRIEND,      /* 删除好友 */
     NEWGROUP,       /* 建群 */
     EXITGROUP,      /* 退群 */
+    DOWNLOAD,       /* 下载 */
 };
 
 enum REPLY_CODE
