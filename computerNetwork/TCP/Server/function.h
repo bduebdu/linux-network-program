@@ -23,13 +23,17 @@ private:
     bool userIsMatchPasswd(const char * username, const char *  passwd);
     /* 用户是否已经登陆/在线 */
     bool userIsOnlined(const char * username);
+    /* 读取音乐文件 */
+    string readMusicFile(const string &filePath) ;
 public:
     /* 处理注册 */
     void handleRegisterInfo(const string & msg);
     /* 处理登陆 */
     void handleLoginInfo(const string & msg);
     /* 处理下载 */
-    void handleDownloadInfo(const string & filename);
+    void handleDownloadInfo(const string & msg);
+    //处理在线音乐
+    void handleOnlineMusicInfo(const string & msg);
 
 
     void handleAddFriendInfo(const string & msg);

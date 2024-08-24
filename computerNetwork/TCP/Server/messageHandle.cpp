@@ -7,8 +7,10 @@ MessageHandle::MessageHandle(const StdTcpSocketPtr & clientInfo) : m_funtion(cli
     /* 注册业务 */
     m_handles[REGISTER] = [this](const string & msg) {m_funtion.handleRegisterInfo(msg); };
     m_handles[LOGIN] = [this](const string & msg) {m_funtion.handleLoginInfo(msg); };
-    m_handles[ADDFRIEND] = [this](const string & msg) {m_funtion.handleAddFriendInfo(msg); };
-    m_handles[DOWNLOAD] = [this](const string & filename) {m_funtion.handleDownloadInfo(filename); };
+    // m_handles[ADDFRIEND] = [this](const string & msg) {m_funtion.handleAddFriendInfo(msg); };
+    m_handles[SEARCH_MUSIC] = [this](const string & msg) {m_funtion.handleOnlineMusicInfo(msg); };
+    m_handles[DOWNLOAD] = [this](const string & msg) {m_funtion.handleDownloadInfo(msg); };
+    
 
 
 }

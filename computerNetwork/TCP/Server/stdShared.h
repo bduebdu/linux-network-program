@@ -6,12 +6,15 @@ enum FUNCTION_OPTION
 {
     REGISTER = 1,   /* 注册 */
     LOGIN,          /* 登陆 */
-    EXIT,
-    ADDFRIEND,      /* 添加好友 */
-    DELFRIEND,      /* 删除好友 */
-    NEWGROUP,       /* 建群 */
-    EXITGROUP,      /* 退群 */
+    // EXIT,
+    // ADDFRIEND,      /* 添加好友 */
+    // DELFRIEND,      /* 删除好友 */
+    // NEWGROUP,       /* 建群 */
+    // EXITGROUP,      /* 退群 */
+    SEARCH_MUSIC,             //搜索
     DOWNLOAD,       /* 下载 */
+
+
 };
 
 enum REPLY_CODE
