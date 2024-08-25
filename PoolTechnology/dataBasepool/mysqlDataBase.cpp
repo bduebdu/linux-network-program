@@ -99,3 +99,20 @@ void stdMysqlDataBase::closeDB()
     }
     
 };
+
+//刷新存活时间
+void stdMysqlDataBase::refreshAliveTime()
+{
+    m_backupCurrentTime = std::chrono::steady_clock::now();//获取当前时间
+
+}
+//获取存活时间
+long stdMysqlDataBase::getAliveTime()
+{
+    //返回当前时间减去备份时间
+    std::chrono::nanoseconds res = std::chrono::steady_clock::now() - m_backupCurrentTime;
+    //精度转换
+    std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(res);
+
+    return sec.count();
+}

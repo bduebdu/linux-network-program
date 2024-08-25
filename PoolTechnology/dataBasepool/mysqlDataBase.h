@@ -3,7 +3,7 @@
 #include "stdDataBase.h"
 #include<mysql/mysql.h>
 #include<unistd.h>
-
+#include <chrono>
 class stdMysqlDataBase : public stdDataBase
 {
 public:
@@ -19,10 +19,16 @@ public:
     //关闭数据库
     void closeDB();
 public:
+    //刷新存活时间
+    void refreshAliveTime();
+    //获取存活时间
+    long getAliveTime();
 
 
 private:
     MYSQL * m_sqlDB;
+    //备份当前时间
+    std::chrono::steady_clock::time_point m_backupCurrentTime;
 
 };
 

@@ -4,7 +4,7 @@ OBJ = $(patsubst %.cpp, %.o, $(wildcard ./*.cpp))
 TARGET = server
 
 LDFLAGS = -L./src_so -L./dataBase_so -L./hashTable_so
-LIBS = -lsqlite3 -ljsoncpp -lpthread -ljson-c -ljsoncpp
+LIBS = -lsqlite3 -ljsoncpp -lpthread -ljson-c -ljsoncpp -lmysqlclient
 # 使用$(TARGET)，必须要加$符号
 $(TARGET): $(OBJ)
 	$(CXX) -g $^ -o $@ $(LIBS)

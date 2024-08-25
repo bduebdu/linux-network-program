@@ -27,7 +27,7 @@ public:
 
 public:
     //获取一个空闲连接
-    shared_ptr<stdDataBase> getConnection();
+    shared_ptr<stdMysqlDataBase> getConnection();
 
 private:
 
@@ -44,7 +44,7 @@ private:
     //初始化连接池
     queue<stdMysqlDataBase *> m_connectionQueue;
     //互斥锁
-    mutex m_muteQ;
+    mutex m_mutexQ;
     //条件变量
     condition_variable m_cond_produce;//生产者条件变量(连接池中的连接不够时)
     condition_variable m_cond_consume;//消费者条件变量（连接池有多余连接的时候）
@@ -55,6 +55,7 @@ private:
     int m_port;
     string m_dbname;
     int m_minSize;
+    int m_maxIdleTime;
 
 };
 
