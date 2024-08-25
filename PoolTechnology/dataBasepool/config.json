@@ -2,9 +2,9 @@
     "hostname":"localhost",
     "username":"root",
     "passwd":"123456",
-    "dbname":"demoTest",
     "port":3306,
-    "minsize":3,
-    "maxidleTime":10
+    "dbname":"demoTest",
+    "minSize":3,
+    "maxIdleTime":10
 
 }
