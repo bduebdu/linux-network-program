@@ -37,6 +37,8 @@ public:
     void handleOnlineLyricInfo(const string & msg);
     //处理在线列表
     void handleOnlineListInfo(const string & msg);
+    //处理批量下载
+    void handleMultipleDownloadInfo(const string & msg);
 
     void handleAddFriendInfo(const string & msg);
             

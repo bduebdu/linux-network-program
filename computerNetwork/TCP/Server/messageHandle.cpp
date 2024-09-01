@@ -11,7 +11,7 @@ MessageHandle::MessageHandle(const StdTcpSocketPtr & clientInfo) : m_funtion(cli
     m_handles[SEARCH_MUSIC] = [this](const string & msg) {m_funtion.handleOnlineMusicInfo(msg); };
     m_handles[SEARCH_LYRIC] = [this](const string & msg) {m_funtion.handleOnlineLyricInfo(msg); };
     m_handles[ONLINE_LIST] = [this](const string & msg) {m_funtion.handleOnlineListInfo(msg); };
-
+    m_handles[MULTIPLE_DONLOAD] = [this](const string & msg) {m_funtion.handleMultipleDownloadInfo(msg); };
 
 
 }

@@ -273,7 +273,95 @@ void Function::handleOnlineListInfo(const string &msg)
 
 }
 
+//处理批量下载
+void Function::handleMultipleDownloadInfo(const string &msg) 
+{
+    std::cout << "handleMultipleDownloadInfo:" << msg << std::endl;
 
+    // 解析请求中的类型
+    json_object *jsonObj = json_tokener_parse(msg.c_str());
+    if (jsonObj != NULL) 
+    {
+        int type = json_object_get_int(json_object_object_get(jsonObj, "type"));
+        if (type == MULTIPLE_DONLOAD)
+        {
+            // 解析请求中的歌曲名称列表
+            json_object *musicNamesJsonArray = json_object_object_get(jsonObj, "musicnames");
+            if (musicNamesJsonArray != NULL && json_object_is_type(musicNamesJsonArray, json_type_array))
+            {
+                // 创建一个JSON对象作为响应
+                json_object *resObj = json_object_new_object();
+                json_object_object_add(resObj, "type", json_object_new_int(MULTIPLE_DONLOAD));
+
+                // 创建一个JSON数组用于存储歌曲数据
+                json_object *musicDataArray = json_object_new_array();
+
+                // 遍历歌曲名称列表
+                for (unsigned int i = 0; i < json_object_array_length(musicNamesJsonArray); ++i)
+                {
+                    json_object *musicNameJson = json_object_array_get_idx(musicNamesJsonArray, i);
+                    if (musicNameJson != NULL && json_object_is_type(musicNameJson, json_type_string))
+                    {
+                        const char *musicName = json_object_get_string(musicNameJson);
+
+                        // 拼接音乐的文件路径
+                        std::string musicFilePath = "./music/" + std::string(musicName) + ".mp3";  // 假设音乐文件为MP3格式
+                        std::string musicData = readMusicFile(musicFilePath);
+
+                        if (!musicData.empty())
+                        {
+                            // 使用 Base64 编码音乐数据
+                            std::string encodedMusicData = base64_encode(reinterpret_cast<const unsigned char*>(musicData.c_str()), musicData.size());
+
+                            // 创建一个JSON对象存储单首歌曲的数据
+                            json_object *musicObj = json_object_new_object();
+                            json_object_object_add(musicObj, "musicname", json_object_new_string(musicName));
+                            json_object_object_add(musicObj, "musiccontent", json_object_new_string(encodedMusicData.c_str()));
+
+                            // 拼接歌词文件路径
+                            std::string lyricsFilePath = "./music/" + std::string(musicName) + ".lrc";
+                            std::string musicData = readMusicFile(lyricsFilePath);
+
+                            if (!musicData.empty())
+                            {
+                                // 使用 Base64 编码歌词数据
+                                std::string encodedLyricsData = base64_encode(reinterpret_cast<const unsigned char*>(musicData.c_str()), musicData.size());
+                                json_object_object_add(musicObj, "lyricscontent", json_object_new_string(encodedLyricsData.c_str()));
+                            }
+                            else
+                            {
+                                std::cout << "Failed to read lyrics file: " << musicName << std::endl;
+                            }
+
+                            // 将单首歌曲的数据添加到数组中
+                            json_object_array_add(musicDataArray, musicObj);
+                        }
+                        else
+                        {
+                            std::cout << "Failed to read music file: " << musicName << std::endl;
+                        }
+                    }
+                }
+
+                // 将音乐数据数组添加到响应对象中
+                json_object_object_add(resObj, "musiclist", musicDataArray);
+
+                // 构建JSON字符串
+                const char *resStr = json_object_to_json_string(resObj);
+
+                // 发送数据
+                m_clientInfo->sendMessage(resStr);
+
+                // 清理
+                json_object_put(resObj);
+            }
+        }
+    }
+    else
+    {
+        std::cout << "Failed to parse JSON request." << std::endl;
+    }
+}
 
 void Function::handleAddFriendInfo(const string & msg)
 {
