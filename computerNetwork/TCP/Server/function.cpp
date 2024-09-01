@@ -9,6 +9,7 @@
 using namespace std;
 #include "sqliteDataBase.h"
 #include "base64.h"
+#include <sys/stat.h>
 
 
 
@@ -158,18 +159,118 @@ void Function::handleOnlineMusicInfo(const string & msg)
     else
     {
         cout<<"empty"<<endl;
-        
-       
     }
 
     const char * resStr = json_object_to_json_string(resObj);
-    cout << "resStr:" << resStr << endl;
+    // cout << "resStr:" << resStr << endl;
     m_clientInfo->sendMessage(resStr);
 }
-
-void Function::handleDownloadInfo(const string & msg)
+//处理在线歌词
+void Function::handleOnlineLyricInfo(const string & msg)
 {
-   
+    cout << "handleOnlineLyricInfo:" <<  msg << endl;
+
+    const char * lyricname = NULL;
+    json_object * jsonObj = json_tokener_parse(msg.c_str());
+    if (jsonObj != NULL)
+    {
+        lyricname = json_object_get_string(json_object_object_get(jsonObj, "lyricname"));
+    }
+
+
+    /* 构建json字符串 */
+    /* 1. 创建响应json对象 */
+    json_object * resObj = json_object_new_object();
+    /* 2. 设置<key:value> */
+    json_object_object_add(resObj, "type", json_object_new_int(SEARCH_LYRIC));
+
+
+    /* 拼接歌词的文件路径 */
+    string lyricFilePath = "./music/"+ string(lyricname) + ".lrc";  // 假设音乐文件为MP3格式
+    string lyricData = readMusicFile(lyricFilePath);
+    cout << "size:" << lyricData.size() << endl;
+    if (!lyricData.empty()) 
+    {
+        // 使用 Base64 编码音乐数据
+        string encodedLyricData = base64_encode(reinterpret_cast<const unsigned char*>(lyricData.c_str()), lyricData.size());
+
+        json_object_object_add(resObj, "lyricname", json_object_new_string(lyricname));
+        json_object_object_add(resObj, "lyriccontent", json_object_new_string(encodedLyricData.c_str()));
+    
+    }
+    else
+    {
+        cout<<"empty"<<endl;
+    }
+
+    const char * resStr = json_object_to_json_string(resObj);
+    // cout << "resStr:" << resStr << endl;
+    m_clientInfo->sendMessage(resStr);
+}    
+
+//处理在线列表
+void Function::handleOnlineListInfo(const string &msg) 
+{
+        std::cout << "handleOnlineListInfo:" << msg << std::endl;
+        // 解析请求中的类型
+        json_object *jsonObj = json_tokener_parse(msg.c_str());
+        if (jsonObj != NULL) {
+            int type = json_object_get_int(json_object_object_get(jsonObj, "type"));
+            if (type == ONLINE_LIST) {
+                // 读取指定路径下的所有歌曲名
+                std::vector<std::string> musicNames;
+                // 打开目录
+                DIR *dir = opendir("./music");
+                if (dir != NULL) {
+                    struct dirent *entry;
+                    while ((entry = readdir(dir)) != NULL) {
+                        // 检查是否为 "." 或 ".."
+                        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+                            continue;
+                        }
+                        std::string fullPath = "./music/";
+                        fullPath += entry->d_name;
+                        struct stat fileInfo;
+                        if (stat(fullPath.c_str(), &fileInfo) == 0 && S_ISREG(fileInfo.st_mode)) {
+                            // 检查文件扩展名
+                            if (fullPath.find_last_of(".") != std::string::npos) {
+                                std::string extension = fullPath.substr(fullPath.find_last_of(".") + 1);
+                                if (extension == "mp3") {
+                                    std::string baseName = entry->d_name;
+                                    size_t dotPos = baseName.find_last_of(".");
+                                    if (dotPos != std::string::npos) {
+                                        baseName.erase(dotPos); // 去除扩展名
+                                    }
+                                    musicNames.push_back(baseName);
+                                }
+                            }
+                        }
+                    }
+                    closedir(dir);
+                } else {
+                    std::cout << "Failed to open directory: ./music" << std::endl;
+                }
+
+                // 构建响应 JSON 对象
+                json_object *resObj = json_object_new_object();
+                json_object_object_add(resObj, "type", json_object_new_int(ONLINE_LIST));
+
+                // 添加歌曲名列表
+                json_object *musicNamesArray = json_object_new_array();
+                for (const auto &musicName : musicNames) {
+                    json_object_array_add(musicNamesArray, json_object_new_string(musicName.c_str()));
+                }
+                json_object_object_add(resObj, "musicnames", musicNamesArray);
+
+                // 转换为字符串并发送
+                const char *resStr = json_object_to_json_string(resObj);
+                m_clientInfo->sendMessage(resStr);
+
+                // 清理内存
+                json_object_put(resObj);
+            }
+        }
+
 }
 
 

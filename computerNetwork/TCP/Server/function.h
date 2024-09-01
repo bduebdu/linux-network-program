@@ -30,11 +30,13 @@ public:
     void handleRegisterInfo(const string & msg);
     /* 处理登陆 */
     void handleLoginInfo(const string & msg);
-    /* 处理下载 */
-    void handleDownloadInfo(const string & msg);
+
     //处理在线音乐
     void handleOnlineMusicInfo(const string & msg);
-
+    //处理在线歌词
+    void handleOnlineLyricInfo(const string & msg);
+    //处理在线列表
+    void handleOnlineListInfo(const string & msg);
 
     void handleAddFriendInfo(const string & msg);
             

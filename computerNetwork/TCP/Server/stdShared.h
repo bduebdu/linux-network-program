@@ -11,8 +11,12 @@ enum FUNCTION_OPTION
     // DELFRIEND,      /* 删除好友 */
     // NEWGROUP,       /* 建群 */
     // EXITGROUP,      /* 退群 */
-    SEARCH_MUSIC,             //搜索
-    DOWNLOAD,       /* 下载 */
+    SEARCH_MUSIC,             //搜索音乐
+    SEARCH_LYRIC,             //搜索歌词
+    ONLINE_LIST,             //在线列表
+
+
+
 
 
 };

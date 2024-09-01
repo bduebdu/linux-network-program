@@ -9,8 +9,9 @@ MessageHandle::MessageHandle(const StdTcpSocketPtr & clientInfo) : m_funtion(cli
     m_handles[LOGIN] = [this](const string & msg) {m_funtion.handleLoginInfo(msg); };
     // m_handles[ADDFRIEND] = [this](const string & msg) {m_funtion.handleAddFriendInfo(msg); };
     m_handles[SEARCH_MUSIC] = [this](const string & msg) {m_funtion.handleOnlineMusicInfo(msg); };
-    m_handles[DOWNLOAD] = [this](const string & msg) {m_funtion.handleDownloadInfo(msg); };
-    
+    m_handles[SEARCH_LYRIC] = [this](const string & msg) {m_funtion.handleOnlineLyricInfo(msg); };
+    m_handles[ONLINE_LIST] = [this](const string & msg) {m_funtion.handleOnlineListInfo(msg); };
+
 
 
 }
